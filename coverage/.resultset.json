@@ -1,7 +1,7 @@
 {
   "RSpec": {
     "coverage": {
-      "/Users/aramsimonian/oystercard/spec/oystercard_spec.rb": [
+      "/Users/lucas/Dropbox/Coding/Projects/oyster-card-lucas-hugo/spec/oystercard_spec.rb": [
         1,
         null,
         1,
@@ -71,11 +71,10 @@
         null,
         null
       ],
-      "/Users/aramsimonian/oystercard/lib/oystercard.rb": [
+      "/Users/lucas/Dropbox/Coding/Projects/oyster-card-lucas-hugo/lib/oystercard.rb": [
         1,
         1,
         null,
-        1,
         1,
         1,
         null,
@@ -110,6 +109,6 @@
         null
       ]
     },
-    "timestamp": 1507045346
+    "timestamp": 1507124219
   }
 }
