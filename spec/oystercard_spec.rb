@@ -51,22 +51,31 @@ describe Oystercard do
   end
 
   describe '#touch_out' do
-    let(:station) {double(:station)}
+    let(:in_station) {double(:in_station)}
+    let(:out_station) {double(:out_station)}
+
     it 'updates in_journey to false' do
-      oystercard.touch_out
+      oystercard.touch_out(out_station)
       expect(oystercard).not_to be_in_journey
     end
 
     it 'deducts the minimum fare' do
       oystercard.top_up(Oystercard::MINIMUM_BALANCE)
-      oystercard.touch_in(station)
-      expect { oystercard.touch_out }.to change {oystercard.balance}.by(-Oystercard::MINIMUM_BALANCE)
+      oystercard.touch_in(in_station)
+      expect { oystercard.touch_out(out_station) }.to change {oystercard.balance}.by(-Oystercard::MINIMUM_BALANCE)
     end
 
     it 'resets entry_station to nil when touching out' do
       oystercard.top_up(Oystercard::MINIMUM_BALANCE)
-      oystercard.touch_in(station)
-      expect { oystercard.touch_out }.to change { oystercard.entry_station }.from(station).to(nil)
+      oystercard.touch_in(in_station)
+      expect { oystercard.touch_out(out_station) }.to change { oystercard.entry_station }.from(in_station).to(nil)
+    end
+
+    it 'notes the exit station of a journey' do
+      oystercard.top_up(Oystercard::MINIMUM_BALANCE)
+      oystercard.touch_in(in_station)
+      oystercard.touch_out(out_station)
+      expect(oystercard.exit_station).to eq(out_station)
     end
   end
 
