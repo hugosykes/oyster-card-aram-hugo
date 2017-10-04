@@ -3,6 +3,12 @@ require './lib/oystercard'
 describe Oystercard do
   subject(:oystercard) { described_class.new }
 
+  describe '#initialize' do
+    it 'expects oystercard to be initialzed with an empty array' do
+      expect(oystercard.journeys).to eq Array.new
+    end
+  end
+
   describe '#balance' do
     it 'check a new card has a balance of zero' do
       expect(subject.balance).to eq 0
