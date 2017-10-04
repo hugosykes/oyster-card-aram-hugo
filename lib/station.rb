@@ -3,6 +3,6 @@ class Station
 
   def initialize
     @name = ''
-    @zone = rand(6)
+    @zone = (1..6).to_a.sample
   end
 end
