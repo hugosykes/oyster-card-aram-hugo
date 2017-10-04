@@ -10,7 +10,7 @@ class Oystercard
   end
 
   def top_up(amount)
-    fail "Card limit #{MAXIMUM_BALANCE} exceeded!" if @balance + amount > MAXIMUM_BALANCE
+    raise "Card limit #{MAXIMUM_BALANCE} exceeded!" if @balance + amount > MAXIMUM_BALANCE
     @balance += amount
   end
 
@@ -19,7 +19,7 @@ class Oystercard
   end
 
   def touch_in(entry_station)
-    fail "Card balance below minimum of #{Oystercard::MINIMUM_BALANCE}!" if @balance < MINIMUM_BALANCE
+    touching_in_errors
     @entry_station = entry_station
   end
 
@@ -37,10 +37,15 @@ class Oystercard
   end
 
   def add_journey
-    @journeys << {entry_station: @entry_station, exit_station: @exit_station}
+    @journeys << { entry_station: @entry_station, exit_station: @exit_station }
   end
 
   def forget_entry_station
     @entry_station = nil
+  end
+
+  def touching_in_errors
+    raise 'Already touched in!' if @entry_station
+    raise "Card balance below minimum of #{Oystercard::MINIMUM_BALANCE}!" if @balance < MINIMUM_BALANCE
   end
 end
