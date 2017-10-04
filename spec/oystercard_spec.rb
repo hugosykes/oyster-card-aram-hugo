@@ -10,7 +10,7 @@ describe Oystercard do
 
   describe '#initialize' do
     it 'expects oystercard to be initialzed with an empty array' do
-      expect(oystercard.journeys).to eq Array.new
+      expect(oystercard.journeys).to be_empty
     end
   end
 
@@ -65,7 +65,7 @@ describe Oystercard do
       expect(oystercard).not_to be_in_journey
     end
 
-    context 'touched in' do
+    context 'already in journey' do
       before do
         oystercard.touch_in(in_station)
       end
