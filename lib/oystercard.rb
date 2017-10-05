@@ -1,13 +1,15 @@
-require 'Journey'
+require_relative 'Journey'
 class Oystercard
-  attr_reader :balance, :entry_station, :journeys, :exit_station
+  attr_reader :balance, :journeys
 
   MAXIMUM_BALANCE = 90
-  MINIMUM_BALANCE = 1
+  MINIMUM_CHARGE = 1
+  PENALTY_FARE = 6
 
   def initialize
     @balance = 0
     @journeys = []
+    @current_journey = nil
   end
 
   def top_up(amount)
@@ -16,19 +18,26 @@ class Oystercard
   end
 
   def in_journey?
-    !!@entry_station
+    !!@current_journey
   end
 
   def touch_in(entry_station)
     touching_in_errors
-    @entry_station = entry_station
+    @current_journey = Journey.new(entry_station)
   end
 
   def touch_out(exit_station)
-    deduct(MINIMUM_BALANCE)
-    @exit_station = exit_station
+    @current_journey.end_journey(exit_station)
+    deduct(@current_journey.fare)
     add_journey
-    forget_entry_station
+  end
+
+  def entry_station
+    !!@current_journey ? @current_journey.entry_station : nil
+  end
+
+  def exit_station
+    !!@journeys ? @journeys.last.exit_station : nil
   end
 
   private
@@ -38,15 +47,12 @@ class Oystercard
   end
 
   def add_journey
-    @journeys << Journey.new(@entry_station, @exit_station)
-  end
-
-  def forget_entry_station
-    @entry_station = nil
+    @journeys << @current_journey
+    @current_journey = nil
   end
 
   def touching_in_errors
-    raise 'Already touched in!' if @entry_station
-    raise "Card balance below minimum of #{Oystercard::MINIMUM_BALANCE}!" if @balance < MINIMUM_BALANCE
+    raise "Card balance below minimum of #{Oystercard::MINIMUM_CHARGE}!" if @balance < MINIMUM_CHARGE
+    deduct(PENALTY_FARE) if entry_station
   end
 end

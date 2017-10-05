@@ -2,7 +2,9 @@ require './lib/oystercard'
 
 describe Oystercard do
   let(:oystercard) { described_class.new }
-  before { oystercard.top_up(Oystercard::MINIMUM_BALANCE) }
+  before { oystercard.top_up(Oystercard::MINIMUM_CHARGE) }
+  let(:in_station) { double(:in_station) }
+  let(:out_station) { double(:out_station) }
 
   describe '#initialize' do
     it 'expects oystercard to be initialized with an empty array' do
@@ -33,15 +35,13 @@ describe Oystercard do
   end
 
   describe '#touch_in' do
-    let(:in_station) { double(:in_station) }
-
     it 'updates in_journey to true' do
       oystercard.touch_in(in_station)
       expect(oystercard).to be_in_journey
     end
 
     it 'only allows touch in if the card has a minimum balance' do
-      expect { subject.touch_in(in_station) }.to raise_error "Card balance below minimum of #{Oystercard::MINIMUM_BALANCE}!"
+      expect { subject.touch_in(in_station) }.to raise_error "Card balance below minimum of #{Oystercard::MINIMUM_CHARGE}!"
     end
 
     it 'notes the entry station of a journey' do
@@ -51,9 +51,6 @@ describe Oystercard do
   end
 
   describe '#touch_out' do
-    let(:in_station) { double(:in_station) }
-    let(:out_station) { double(:out_station) }
-
     context 'already in journey' do
       before do
         oystercard.touch_in(in_station)
@@ -65,7 +62,7 @@ describe Oystercard do
       end
 
       it 'deducts the minimum fare' do
-        expect { oystercard.touch_out(out_station) }.to change { oystercard.balance }.by(-Oystercard::MINIMUM_BALANCE)
+        expect { oystercard.touch_out(out_station) }.to change { oystercard.balance }.by(-Oystercard::MINIMUM_CHARGE)
       end
 
       it 'resets entry_station to nil when touching out' do
@@ -81,10 +78,16 @@ describe Oystercard do
         oystercard.touch_out(out_station)
         expect(oystercard.journeys[0]).to be_instance_of(Journey)
       end
+    end
+  end
 
-      it 'should raise an error if trying to touch in twice' do
-        expect { oystercard.touch_in(in_station) }.to raise_error 'Already touched in!'
-      end
+  describe 'fares' do
+    before do
+      oystercard.top_up(Oystercard::PENALTY_FARE)
+    end
+    it 'should charge the penalty fare if touching in twice' do
+      oystercard.touch_in(in_station)
+      expect { oystercard.touch_in(in_station) }.to change { oystercard.balance }.by(-Oystercard::PENALTY_FARE)
     end
   end
 end
