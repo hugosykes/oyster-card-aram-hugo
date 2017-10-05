@@ -1,3 +1,4 @@
+require 'Journey'
 class Oystercard
   attr_reader :balance, :entry_station, :journeys, :exit_station
 
@@ -37,7 +38,7 @@ class Oystercard
   end
 
   def add_journey
-    @journeys << { entry_station: @entry_station, exit_station: @exit_station }
+    @journeys << Journey.new(@entry_station, @exit_station)
   end
 
   def forget_entry_station

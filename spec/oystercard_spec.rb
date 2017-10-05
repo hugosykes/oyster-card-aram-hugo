@@ -1,14 +1,11 @@
 require './lib/oystercard'
 
 describe Oystercard do
-  let(:oystercard) do
-    oc = described_class.new
-    oc.top_up(Oystercard::MINIMUM_BALANCE)
-    oc
-  end
+  let(:oystercard) { described_class.new }
+  before { oystercard.top_up(Oystercard::MINIMUM_BALANCE) }
 
   describe '#initialize' do
-    it 'expects oystercard to be initialzed with an empty array' do
+    it 'expects oystercard to be initialized with an empty array' do
       expect(oystercard.journeys).to be_empty
     end
   end
@@ -39,7 +36,6 @@ describe Oystercard do
     let(:in_station) { double(:in_station) }
 
     it 'updates in_journey to true' do
-      oystercard.top_up(Oystercard::MINIMUM_BALANCE)
       oystercard.touch_in(in_station)
       expect(oystercard).to be_in_journey
     end
@@ -49,7 +45,6 @@ describe Oystercard do
     end
 
     it 'notes the entry station of a journey' do
-      oystercard.top_up(Oystercard::MINIMUM_BALANCE)
       oystercard.touch_in(in_station)
       expect(oystercard.entry_station).to eq(in_station)
     end
@@ -59,14 +54,14 @@ describe Oystercard do
     let(:in_station) { double(:in_station) }
     let(:out_station) { double(:out_station) }
 
-    it 'updates in_journey to false' do
-      oystercard.touch_out(out_station)
-      expect(oystercard).not_to be_in_journey
-    end
-
     context 'already in journey' do
       before do
         oystercard.touch_in(in_station)
+      end
+
+      it 'updates in_journey to false' do
+        oystercard.touch_out(out_station)
+        expect(oystercard).not_to be_in_journey
       end
 
       it 'deducts the minimum fare' do
@@ -84,7 +79,7 @@ describe Oystercard do
 
       it 'creates a journey from in and out stations' do
         oystercard.touch_out(out_station)
-        expect(oystercard.journeys).to include(entry_station: in_station, exit_station: out_station)
+        expect(oystercard.journeys[0]).to be_instance_of(Journey)
       end
 
       it 'should raise an error if trying to touch in twice' do
