@@ -1,1 +1,1 @@
-## Oyster Card challenge, Lucas Salmins & Hugo Sykes
+## Oyster Card challenge, Aram Simonian & Hugo Sykes
