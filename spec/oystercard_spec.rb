@@ -1,14 +1,9 @@
 require './lib/oystercard'
 
 describe Oystercard do
-  let(:oystercard) { described_class.new }
-  before { oystercard.top_up(Oystercard::MINIMUM_CHARGE) }
-  let(:in_station) { double(:in_station) }
-  let(:out_station) { double(:out_station) }
-
   describe '#initialize' do
     it 'expects oystercard to be initialized with an empty array' do
-      expect(oystercard.journeys).to be_empty
+      expect(subject.journeys).to be_empty
     end
   end
 
@@ -20,7 +15,8 @@ describe Oystercard do
 
   describe '#top_up' do
     it 'allow a card to be topped up' do
-      expect { oystercard.top_up 1 }.to change { oystercard.balance }.by 1
+      val = rand(Oystercard::MAXIMUM_BALANCE)
+      expect { subject.top_up val }.to change { subject.balance }.by val
     end
 
     it 'throws exception if top-up limit is exceeded' do
@@ -28,66 +24,23 @@ describe Oystercard do
     end
   end
 
-  describe '#in_journey' do
-    it 'returns status' do
-      expect(oystercard).not_to be_in_journey
+  describe '#deduct' do
+    before { subject.top_up Oystercard::MAXIMUM_BALANCE }
+    it 'should deduct money from the card' do
+      val = rand(Oystercard::MAXIMUM_BALANCE)
+      expect { subject.deduct val }.to change { subject.balance }.by(-val)
     end
   end
 
-  describe '#touch_in' do
-    it 'updates in_journey to true' do
-      oystercard.touch_in(in_station)
-      expect(oystercard).to be_in_journey
+  describe '#last_journey' do
+    it 'should return nil if journeys array is empty' do
+      expect(subject.last_journey).to be_nil
     end
 
-    it 'only allows touch in if the card has a minimum balance' do
-      expect { subject.touch_in(in_station) }.to raise_error "Card balance below minimum of #{Oystercard::MINIMUM_CHARGE}!"
-    end
-
-    it 'notes the entry station of a journey' do
-      oystercard.touch_in(in_station)
-      expect(oystercard.entry_station).to eq(in_station)
-    end
-  end
-
-  describe '#touch_out' do
-    context 'already in journey' do
-      before do
-        oystercard.touch_in(in_station)
-      end
-
-      it 'updates in_journey to false' do
-        oystercard.touch_out(out_station)
-        expect(oystercard).not_to be_in_journey
-      end
-
-      it 'deducts the minimum fare' do
-        expect { oystercard.touch_out(out_station) }.to change { oystercard.balance }.by(-Oystercard::MINIMUM_CHARGE)
-      end
-
-      it 'resets entry_station to nil when touching out' do
-        expect { oystercard.touch_out(out_station) }.to change { oystercard.entry_station }.from(in_station).to(nil)
-      end
-
-      it 'notes the exit station of a journey' do
-        oystercard.touch_out(out_station)
-        expect(oystercard.exit_station).to eq(out_station)
-      end
-
-      it 'creates a journey from in and out stations' do
-        oystercard.touch_out(out_station)
-        expect(oystercard.journeys[0]).to be_instance_of(Journey)
-      end
-    end
-  end
-
-  describe 'fares' do
-    before do
-      oystercard.top_up(Oystercard::PENALTY_FARE)
-    end
-    it 'should charge the penalty fare if touching in twice' do
-      oystercard.touch_in(in_station)
-      expect { oystercard.touch_in(in_station) }.to change { oystercard.balance }.by(-Oystercard::PENALTY_FARE)
+    let(:journey) { double(:journey) }
+    it 'should return last object in the journeys array' do
+      subject.journeys << journey
+      expect(subject.last_journey).to eq journey
     end
   end
 end
