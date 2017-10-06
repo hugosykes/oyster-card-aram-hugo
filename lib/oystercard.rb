@@ -1,6 +1,6 @@
 require_relative 'Journey'
 class Oystercard
-  attr_reader :balance, :journeys, :current_journey
+  attr_reader :balance, :journeys
 
   MAXIMUM_BALANCE = 90
   MINIMUM_CHARGE = 1

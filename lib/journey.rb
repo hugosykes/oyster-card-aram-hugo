@@ -18,14 +18,14 @@ class Journey
     card.last_journey[:exit_station] = exit_station
   end
 
+  def in_journey?
+    !!@entry_station
+  end
+
   private
 
   def card
     @oystercard
-  end
-
-  def in_journey?
-    !!@entry_station
   end
 
   def fare
