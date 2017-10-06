@@ -17,14 +17,15 @@ describe Journey do
     context 'card has minimum balance' do
       it 'notes the entry station' do
         subject.touch_in(entry_station)
-        expect(subject).to be_in_journey
+        expect(subject.entry_station).to eq(entry_station)
       end
     end
   end
 
   describe '#touch_out' do
-    it 'should deduct penalty fare for not touching in' do
-      expect { subject.touch_out(exit_station) }.to change { oystercard.balance }.by(-Oystercard::PENALTY_FARE)
+    it 'notes the exit station' do
+      subject.touch_out(exit_station)
+      expect(subject.exit_station).to eq(exit_station)
     end
 
     context 'touched in' do
@@ -33,5 +34,10 @@ describe Journey do
         expect { subject.touch_out(exit_station) }.to change { oystercard.balance }.by(Oystercard::PENALTY_FARE - 1)
       end
     end
+  end
+
+  describe '#calc_and_set' do
+
+
   end
 end
